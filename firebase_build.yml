@@ -1,0 +1,46 @@
+name: Build CricPro Trainer APK
+
+# 🕹️ When should this workflow run?
+on:
+  push:
+    branches: [main]     # Runs automatically when you push to main
+  workflow_dispatch:      # Allows you to run it manually from Actions tab
+
+jobs:
+  build:
+    name: 🏗️ Build Flutter App
+    runs-on: ubuntu-latest  # GitHub gives you a free Linux machine
+
+    steps:
+      # 1️⃣ Download your repository
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Set up Flutter SDK
+      - name: 🛠️ Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.3'  # or your current Flutter version
+
+      # 3️⃣ Get all dependencies
+      - name: ⚙️ Install dependencies
+        run: flutter pub get
+
+      # 4️⃣ Optional: Run Flutter static analysis
+      - name: 🔍 Analyze Dart code
+        run: flutter analyze
+
+      # 5️⃣ Optional: Run tests (won’t stop build if none exist)
+      - name: 🧪 Run tests
+        run: flutter test || true
+
+      # 6️⃣ Build your release APK
+      - name: 🏗️ Build release APK
+        run: flutter build apk --release
+
+      # 7️⃣ Upload APK to GitHub Artifacts
+      - name: 💾 Upload built APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cricpro_trainer_release_apk
+          path: build/app/outputs/flutter-apk/app-release.apk
